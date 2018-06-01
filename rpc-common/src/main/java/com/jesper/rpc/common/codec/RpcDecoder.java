@@ -28,7 +28,11 @@ public class RpcDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
-
+        //ByteToMessageDecoder可能出现半包问题，定义4个字节来存储，字节小于4被认为是半包先不读，下次再读取
+        if (byteBuf.readableBytes() < 4) {
+            return;
+        }
+        byteBuf.markReaderIndex();
         // ByteBuf的长度
         int length = byteBuf.readInt();
         if (length < 0)

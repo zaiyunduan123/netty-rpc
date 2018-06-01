@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * SerializationUtil:具备缓存功能的序列化工具类，基于Protostuff实现
+ * SerializationUtil:具备缓存功能的序列化工具类，原生的序列化性能效率较低，产生的码流较大，所以采用了Protostuff实现
  * <p>
  */
 public class SerializationUtil {
