@@ -1,15 +1,17 @@
-package com.jesper.rpc.common.pojo;
+package com.jesper.rpc.common.dto;
 
-
-public class RPCResponse {
+/**
+ * Created by jiangyunxiong on 2018/6/1.
+ *
+ * server向client端发送数据的传输载体
+ */
+public class RpcResponse {
 
     private String requestId;
-    private Throwable error;
-    private Object result;
 
-    public boolean isError() {
-        return error != null;
-    }
+    private Throwable error;
+
+    private Object result;
 
     public String getRequestId() {
         return requestId;
@@ -34,5 +36,4 @@ public class RPCResponse {
     public void setResult(Object result) {
         this.result = result;
     }
-
 }

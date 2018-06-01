@@ -105,7 +105,7 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
-        <!-- 聚合工程minidubbo用来统一管理依赖和依赖的版本号即可，不建议在这里添加其它非通用的依赖 -->
+
         <!-- 这里可以统一添加junit依赖 -->
         <!-- junit -->
         <dependency>
