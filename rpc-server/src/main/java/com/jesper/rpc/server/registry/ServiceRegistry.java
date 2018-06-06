@@ -110,6 +110,7 @@ public class ServiceRegistry {
                     // 如果状态为已连接，则使用CountDownLatch计数器减1
                     if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {
                         latch.countDown();
+                        logger.info("连接成功了。。。");
                     }
                 }
             });
