@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Created by jiangyunxiong on 2018/6/1.
- *
+ * <p>
  * 编码器：负责将Object类型的POJO对象编码为byte数组，然后写入到ByteBuf中 ，底层实现是序列化
  */
 public class RpcEncoder extends MessageToByteEncoder<Object> {
@@ -20,6 +20,10 @@ public class RpcEncoder extends MessageToByteEncoder<Object> {
 
     public RpcEncoder(Class<?> genericClass) {
         this.genericClass = genericClass;
+    }
+
+    public RpcEncoder() {
+
     }
 
     @Override

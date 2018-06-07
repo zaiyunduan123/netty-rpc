@@ -13,6 +13,10 @@ public class RpcResponse {
 
     private Object result;
 
+    public boolean isError() {
+        return error != null;
+    }
+
     public String getRequestId() {
         return requestId;
     }

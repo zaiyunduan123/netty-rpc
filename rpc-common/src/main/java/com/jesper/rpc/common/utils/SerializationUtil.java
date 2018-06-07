@@ -1,12 +1,10 @@
 package com.jesper.rpc.common.utils;
-
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import org.springframework.objenesis.Objenesis;
 import org.springframework.objenesis.ObjenesisStd;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

@@ -15,14 +15,14 @@ import java.util.Map;
  * <p>
  * 负责处理用户的请求，并返回响应结果
  */
-public class RPCServerHandler extends ChannelInboundHandlerAdapter {
+public class RpcServerHandler extends ChannelInboundHandlerAdapter {
 
     Map<String, Object> serviceBeanMap = null;
     // log4j日志记录
-    Logger logger = LoggerFactory.getLogger(RPCServerHandler.class);
+    Logger logger = LoggerFactory.getLogger(RpcServerHandler.class);
 
 
-    public RPCServerHandler(Map<String, Object> serviceBeanMap) {
+    public RpcServerHandler(Map<String, Object> serviceBeanMap) {
         this.serviceBeanMap = serviceBeanMap;
     }
 
@@ -42,15 +42,24 @@ public class RPCServerHandler extends ChannelInboundHandlerAdapter {
         RpcResponse rpcResponse = new RpcResponse();
         //设置requestId
         rpcResponse.setRequestId(request.getRequestId());
-        try{
+        try {
             logger.info("准备调用handle方法处理request请求对象...");
-        }catch (Throwable e){
-
+            //调用handle方法处理request
+            Object result = handleReuqest(request);
+            //设置返回结果
+            rpcResponse.setResult(result);
+        } catch (Throwable e) {
+            //如果有异常，则设置异常信息
+            rpcResponse.setError(e);
         }
+
+        logger.info("请求处理完毕，准备回写response对象...");
+        ctx.writeAndFlush(rpcResponse);
     }
 
     /**
      * 对request进行处理，其实就是通过反射进行调用的过程
+     *
      * @param request
      * @return
      * @throws Throwable
@@ -78,6 +87,16 @@ public class RPCServerHandler extends ChannelInboundHandlerAdapter {
         logger.info("通过反射调用方法完毕...");
         //返回结果
         return result;
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        ctx.flush();
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        ctx.close();
     }
 }
 

@@ -123,7 +123,7 @@ public class ServiceRegistry {
     public static void main(String[] args) throws IOException {
         ServiceRegistry serviceRegistry = new ServiceRegistry("localhost:2181");
         serviceRegistry.connectServer();
-        serviceRegistry.registerService("192.168.1.102:21881", "com.jyxmust.UserService");
+        serviceRegistry.registerService("localhost:21881", "com.jyxmust.UserService");
         System.in.read();
         Map<String, String> map = new HashMap<>();
         map.put("name", "jyxmust");
