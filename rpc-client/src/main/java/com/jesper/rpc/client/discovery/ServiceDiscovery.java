@@ -6,6 +6,7 @@ import org.apache.zookeeper.ZooKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -86,8 +87,10 @@ public class ServiceDiscovery {
             // 先获取接口名节点的子节点，子节点下是服务器的列表
             // 需要注意的是，如果不存在该节点，会有异常，此时下面的代码就不会执行
             List<String> children = zkClient.getChildren(node, false);
-            // 随机负载均衡，会随机返回注册服务列表中的其中一个服务地址
-            String firstChildren = children.get(getRandomNum(children.size()));
+
+            // 负载均衡：一致性hash算法
+            ConsistentHash.initServers(children);
+            String firstChildren = ConsistentHash.getServer("children");
             // 构建该服务提供者的完整节点名称
             String firstChildrenNode = node + "/" + firstChildren;
             // 获取服务提供者节点的数据，得到serverAddress的byte数组
@@ -101,17 +104,22 @@ public class ServiceDiscovery {
         return serverAddress;
     }
 
-    private Integer getRandomNum(int size) {
-        Random random = new Random();
-        return random.nextInt(size);
-    }
 
 
     public static void main(String[] args) throws Exception {
-        ServiceDiscovery serviceDiscovery = new ServiceDiscovery("localhost:2181");
-        serviceDiscovery.connectServer();
-        String serverAddress = serviceDiscovery.getServerAddress("/rpc/com.jyxmust.UserService");
-        System.out.println("serverAddress: " + serverAddress);
+//        ServiceDiscovery serviceDiscovery = new ServiceDiscovery("localhost:2181");
+//        serviceDiscovery.connectServer();
+//        String serverAddress = serviceDiscovery.getServerAddress("/rpc/com.jyxmust.UserService");
+//        System.out.println("serverAddress: " + serverAddress);
+
+
+        List<String> servers = new ArrayList<>();
+        servers.add("192.168.0.0:111");
+        servers.add("192.168.0.1:111");
+        servers.add("192.168.0.3:111");
+        ConsistentHash.initServers(servers);
+        String firstChildren = ConsistentHash.getServer("166");
+        System.out.println(firstChildren);
     }
 
 }
