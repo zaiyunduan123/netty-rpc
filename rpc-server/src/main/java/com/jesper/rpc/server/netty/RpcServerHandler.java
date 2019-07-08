@@ -2,6 +2,8 @@ package com.jesper.rpc.server.netty;
 
 import com.jesper.rpc.common.dto.RpcRequest;
 import com.jesper.rpc.common.dto.RpcResponse;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -36,25 +38,36 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        logger.info("接收到来自RPC客户端的连接请求...");
+        RpcServer.submit(new Runnable() {
+            @Override
+            public void run() {
+                logger.info("接收到来自RPC客户端的连接请求...");
 
-        RpcRequest request = (RpcRequest) msg;
-        RpcResponse rpcResponse = new RpcResponse();
-        //设置requestId
-        rpcResponse.setRequestId(request.getRequestId());
-        try {
-            logger.info("准备调用handle方法处理request请求对象...");
-            //调用handle方法处理request
-            Object result = handleReuqest(request);
-            //设置返回结果
-            rpcResponse.setResult(result);
-        } catch (Throwable e) {
-            //如果有异常，则设置异常信息
-            rpcResponse.setError(e);
-        }
+                RpcRequest request = (RpcRequest) msg;
+                RpcResponse rpcResponse = new RpcResponse();
+                //设置requestId
+                rpcResponse.setRequestId(request.getRequestId());
+                try {
+                    logger.info("准备调用handle方法处理request请求对象...");
+                    //调用handle方法处理request
+                    Object result = handleReuqest(request);
+                    //设置返回结果
+                    rpcResponse.setResult(result);
+                } catch (Throwable e) {
+                    //如果有异常，则设置异常信息
+                    rpcResponse.setError(e);
+                }
 
-        logger.info("请求处理完毕，准备回写response对象...");
-        ctx.writeAndFlush(rpcResponse);
+                logger.info("请求处理完毕，准备回写response对象...");
+                ctx.writeAndFlush(rpcResponse).addListener(new ChannelFutureListener() {
+                    @Override
+                    public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                        logger.info("请求处理完毕，回写response对象给客户端...");
+                    }
+                });
+            }
+        });
+
     }
 
     /**

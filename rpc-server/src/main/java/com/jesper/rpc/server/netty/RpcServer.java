@@ -22,6 +22,9 @@ import org.springframework.context.ApplicationContextAware;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * RPCServer主要完成下面的几个功能
@@ -37,6 +40,9 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
     private String serverAddress;
 
     private ServiceRegistry serviceRegistry;
+
+    private static ThreadPoolExecutor threadPoolExecutor;
+
 
     private Logger logger = LoggerFactory.getLogger(RpcServer.class);
 
@@ -125,5 +131,17 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
+    }
+
+    public static void submit(Runnable task) {
+        if (threadPoolExecutor == null) {
+            synchronized (RpcServer.class) {
+                if (threadPoolExecutor == null) {
+                    threadPoolExecutor = new ThreadPoolExecutor(16, 32, 700L,
+                            TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
+                }
+            }
+        }
+        threadPoolExecutor.submit(task);
     }
 }
